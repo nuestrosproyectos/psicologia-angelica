@@ -256,14 +256,21 @@
     .nav { gap: 12px; padding: 8px 8px 8px 16px; }
     .brand { font-size: 21px; }
 
-    /* Los tramos se ocultan, PERO los que llevan foto se quedan (si no, se
-       perderían dos fotos del cliente en móvil). */
-    .spacer { display: none; }
-    .spacer.has-photo {
+    /* TODOS los tramos se ven también en móvil: son los respiros del viaje
+       (amanecer -> bosque -> mar -> amanecer). Sin ellos se pierde el viaje. */
+    .spacer {
       display: flex; flex: none; width: 100%; height: auto;
-      padding: 20px 22px 40px;
+      min-height: 62svh; padding: 40px 22px;
+      align-items: center; justify-content: center;
     }
-    .spacer.has-photo .whisper { display: none; }
+    .spacer.has-photo {
+      min-height: auto; padding: 26px 22px 46px;
+      flex-direction: column; gap: 20px;
+    }
+    .whisper {
+      display: block; white-space: normal; text-align: center;
+      font-size: clamp(27px, 7.8vw, 42px); color: rgba(255,255,255,0.62);
+    }
     .photo-float { width: 100%; aspect-ratio: 4 / 3; }
     .photo-float .cap { font-size: 18px; }
 

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Serena · Psicología online — Vuelve a sentirte tú</title>
+<meta name="description" content="Terapia psicológica online para la ansiedad, la autoestima y los momentos difíciles. A tu ritmo, desde donde estés." />
+
+<!-- Fuentes: Instrument Serif (titulares) + Barlow (texto) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --bg: #08090e;
+    --text: #ffffff;
+    --muted: rgba(255, 255, 255, 0.66);
+    --faint: rgba(255, 255, 255, 0.42);
+    --accent: #a9d6cc;   /* verde salvia calmado */
+    --warm: #e7c9a0;     /* dorado cálido suave */
+    --violet: #8f86c9;   /* lavanda */
+    --radius: 20px;
+    --maxw: 1180px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  .container {
+    width: 100%;
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 26px;
+  }
+
+  /* ---------- Fondo: vídeo + aurora de gradientes ---------- */
+  .bg-wrap {
+    position: fixed;
+    inset: -6%;
+    z-index: 0;
+    pointer-events: none;
+    will-change: transform;
+  }
+  .bg-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .aurora {
+    position: absolute;
+    inset: -14%;
+    pointer-events: none;
+    filter: blur(70px) saturate(120%);
+    mix-blend-mode: screen;
+  }
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.3;
+    mix-blend-mode: screen;
+  }
+  .blob.b1 { width: 46vw; height: 46vw; left: -6vw;  top: -4vw;
+    background: radial-gradient(circle at 30% 30%, var(--violet), transparent 62%);
+    animation: drift1 22s ease-in-out infinite; }
+  .blob.b2 { width: 40vw; height: 40vw; right: -6vw; top: 2vw;
+    background: radial-gradient(circle at 60% 40%, var(--accent), transparent 62%);
+    animation: drift2 26s ease-in-out infinite; }
+  .blob.b3 { width: 42vw; height: 42vw; left: 24vw;  bottom: -14vw;
+    background: radial-gradient(circle at 50% 50%, var(--warm), transparent 60%);
+    opacity: 0.4;
+    animation: drift3 30s ease-in-out infinite; }
+  @keyframes drift1 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(6vw,4vw) scale(1.12)} }
+  @keyframes drift2 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-5vw,6vw) scale(1.08)} }
+  @keyframes drift3 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(3vw,-5vw) scale(1.15)} }
+
+  /* velo oscuro para legibilidad + textura */
+  .veil {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background:
+      radial-gradient(ellipse at 50% 42%, rgba(8,9,14,0.15) 0%, rgba(8,9,14,0.62) 78%),
+      linear-gradient(180deg, rgba(8,9,14,0.55), rgba(8,9,14,0.45) 40%, rgba(8,9,14,0.82));
+  }
+  .grain {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- Liquid glass ---------- */
+  .glass {
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.10);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.12), 0 10px 40px rgba(0,0,0,0.25);
+  }
+  .glass-strong {
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border: 1px solid rgba(255,255,255,0.14);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.16), 0 12px 44px rgba(0,0,0,0.3);
+  }
+
+  /* ---------- Botones ---------- */
+  .btn {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-family: 'Barlow', sans-serif; font-weight: 500; font-size: 15px;
+    padding: 14px 26px; border-radius: 999px; cursor: pointer;
+    border: none; transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: #fff; color: #0c0c12;
+  }
+  .btn-primary:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 0 30px 4px rgba(255,255,255,0.22); }
+  .btn-glass {
+    background: rgba(255,255,255,0.05); color: #fff;
+    border: 1px solid rgba(255,255,255,0.16);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  }
+  .btn-glass:hover { transform: translateY(-2px) scale(1.02); box-shadow: inset 0 1px 1px rgba(255,255,255,0.2), 0 0 24px 2px rgba(169,214,204,0.18); }
+  .btn-accent {
+    background: linear-gradient(180deg, var(--accent), #86bdb2); color: #06120f; font-weight: 600;
+  }
+  .btn-accent:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 0 28px 4px rgba(169,214,204,0.3); }
+
+  /* ---------- Nav ---------- */
+  .nav-wrap { position: fixed; top: 18px; left: 0; right: 0; z-index: 50; display: flex; justify-content: center; padding: 0 16px; }
+  .nav {
+    display: flex; align-items: center; gap: 26px;
+    padding: 10px 12px 10px 20px; border-radius: 999px; max-width: 100%;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-family: 'Instrument Serif', serif; font-size: 23px; letter-spacing: .3px; }
+  .brand .dot { width: 10px; height: 10px; border-radius: 50%; background: linear-gradient(180deg, var(--accent), var(--violet)); box-shadow: 0 0 12px var(--accent); }
+  .nav-links { display: flex; align-items: center; gap: 22px; }
+  .nav-links a { font-size: 14px; font-weight: 300; color: var(--muted); transition: color .2s; }
+  .nav-links a:hover { color: #fff; }
+  .nav-cta { display: flex; align-items: center; gap: 12px; }
+  .menu-btn { display: none; background: none; border: none; color: #fff; cursor: pointer; padding: 8px; }
+
+  /* ---------- Hero ---------- */
+  .hero { position: relative; z-index: 2; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 130px 20px 90px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 26px; padding: 7px 16px; border-radius: 999px; }
+  .hero h1 {
+    font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400;
+    font-size: clamp(52px, 9vw, 128px); line-height: 0.98; letter-spacing: -0.02em;
+    margin-bottom: 26px;
+  }
+  .hero h1 .soft { color: var(--accent); }
+  .hero p.lead { max-width: 620px; font-size: clamp(16px, 2.2vw, 20px); font-weight: 300; color: var(--muted); margin-bottom: 38px; }
+  .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+  .hero-trust { margin-top: 42px; display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; color: var(--faint); font-size: 13px; letter-spacing: .5px; }
+  .hero-trust span { display: inline-flex; align-items: center; gap: 8px; }
+
+  /* ---------- Secciones ---------- */
+  section.block { position: relative; z-index: 2; padding: 100px 0; }
+  .sec-head { text-align: center; max-width: 680px; margin: 0 auto 58px; }
+  .sec-head .kicker { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+  .sec-head h2 { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: clamp(34px, 5vw, 58px); line-height: 1.05; margin: 14px 0 16px; }
+  .sec-head p { color: var(--muted); font-weight: 300; font-size: 17px; }
+
+  /* Cards de servicios */
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .card { padding: 30px 26px; border-radius: var(--radius); transition: transform .25s ease, box-shadow .25s ease; }
+  .card:hover { transform: translateY(-5px); box-shadow: inset 0 1px 1px rgba(255,255,255,0.18), 0 18px 50px rgba(0,0,0,0.4); }
+  .card .ico { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; background: rgba(169,214,204,0.12); color: var(--accent); }
+  .card h3 { font-family: 'Instrument Serif', serif; font-size: 24px; font-weight: 400; margin-bottom: 8px; }
+  .card p { color: var(--muted); font-weight: 300; font-size: 15px; }
+
+  /* Sobre mí */
+  .about { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 40px; align-items: center; }
+  .about .portrait { border-radius: var(--radius); min-height: 380px; position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 26px; }
+  .about .portrait::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 30% 20%, rgba(143,134,201,0.5), transparent 60%), radial-gradient(circle at 80% 90%, rgba(169,214,204,0.45), transparent 60%); }
+  .about .portrait .tag { position: relative; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 26px; }
+  .about h2 { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: clamp(30px, 4.4vw, 50px); line-height: 1.06; margin-bottom: 18px; }
+  .about p { color: var(--muted); font-weight: 300; margin-bottom: 16px; }
+  .about ul { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+  .about li { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 15px; }
+  .about li .ck { color: var(--accent); flex-shrink: 0; }
+
+  /* Proceso */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; counter-reset: step; }
+  .step { padding: 32px 26px; border-radius: var(--radius); position: relative; }
+  .step .num { font-family: 'Instrument Serif', serif; font-size: 46px; color: var(--accent); line-height: 1; margin-bottom: 14px; }
+  .step h3 { font-size: 19px; font-weight: 500; margin-bottom: 8px; }
+  .step p { color: var(--muted); font-weight: 300; font-size: 15px; }
+
+  /* Testimonios */
+  .quotes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .quote { padding: 30px 26px; border-radius: var(--radius); }
+  .quote p { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 19px; line-height: 1.4; color: #fff; margin-bottom: 18px; }
+  .quote .who { color: var(--faint); font-size: 13px; letter-spacing: .5px; }
+  .stars { color: var(--warm); margin-bottom: 14px; letter-spacing: 3px; font-size: 14px; }
+
+  /* FAQ */
+  .faq { max-width: 780px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+  .faq-item { border-radius: 16px; overflow: hidden; }
+  .faq-q { width: 100%; text-align: left; background: none; border: none; color: #fff; cursor: pointer; padding: 22px 24px; font-family: 'Barlow', sans-serif; font-size: 17px; font-weight: 400; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+  .faq-q .pm { color: var(--accent); transition: transform .3s; flex-shrink: 0; }
+  .faq-item.open .faq-q .pm { transform: rotate(45deg); }
+  .faq-a { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+  .faq-a p { padding: 0 24px 22px; color: var(--muted); font-weight: 300; }
+
+  /* CTA / Contacto */
+  .contact { position: relative; z-index: 2; padding: 100px 0 120px; }
+  .contact-card { border-radius: 28px; padding: 56px clamp(26px, 5vw, 64px); text-align: center; }
+  .contact-card h2 { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: clamp(34px, 5vw, 60px); line-height: 1.04; margin-bottom: 16px; }
+  .contact-card p { color: var(--muted); font-weight: 300; font-size: 18px; max-width: 560px; margin: 0 auto 34px; }
+  .form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; max-width: 620px; margin: 0 auto; text-align: left; }
+  .form .full { grid-column: 1 / -1; }
+  .form label { display: block; font-size: 13px; color: var(--faint); margin-bottom: 7px; letter-spacing: .5px; }
+  .form input, .form textarea { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 13px 15px; color: #fff; font-family: 'Barlow', sans-serif; font-size: 15px; outline: none; transition: border .2s; }
+  .form input:focus, .form textarea:focus { border-color: var(--accent); }
+  .form textarea { resize: vertical; min-height: 110px; }
+  .form .actions { grid-column: 1 / -1; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 6px; }
+
+  /* Footer */
+  footer { position: relative; z-index: 2; border-top: 1px solid rgba(255,255,255,0.08); padding: 44px 0; }
+  .foot { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; color: var(--faint); font-size: 14px; }
+  .foot .brand { font-size: 20px; }
+  .foot a:hover { color: #fff; }
+
+  /* Reveal on scroll */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .8s ease, transform .8s ease; }
+  .reveal.is-visible { opacity: 1; transform: none; }
+
+  /* Menú móvil */
+  .mobile-menu { position: fixed; inset: 0; z-index: 60; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 28px; background: rgba(8,9,14,0.92); backdrop-filter: blur(20px); }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 30px; color: #fff; }
+  .mobile-menu .close { position: absolute; top: 26px; right: 26px; background: none; border: none; color: #fff; cursor: pointer; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 900px) {
+    .grid, .steps, .quotes { grid-template-columns: 1fr; }
+    .about { grid-template-columns: 1fr; }
+    .nav-links, .nav-cta .btn { display: none; }
+    .menu-btn { display: inline-flex; }
+    .form { grid-template-columns: 1fr; }
+    section.block { padding: 74px 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blob { animation: none; }
+    html { scroll-behavior: auto; }
+    .reveal { transition: none; opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Fondo animado: vídeo cinematográfico (Higgsfield) + aurora de brillo encima -->
+  <div class="bg-wrap" id="bgwrap">
+    <video class="bg-video" autoplay muted loop playsinline preload="auto">
+      <source src="assets/fondo.mp4" type="video/mp4" />
+    </video>
+    <div class="aurora">
+      <div class="blob b1"></div>
+      <div class="blob b2"></div>
+      <div class="blob b3"></div>
+    </div>
+  </div>
+  <div class="veil"></div>
+  <div class="grain"></div>
+
+  <!-- NAV -->
+  <div class="nav-wrap">
+    <nav class="nav glass">
+      <a href="#inicio" class="brand"><span class="dot"></span>Serena</a>
+      <div class="nav-links">
+        <a href="#ayuda">Cómo te ayudo</a>
+        <a href="#sobre">Sobre mí</a>
+        <a href="#proceso">Proceso</a>
+        <a href="#faq">Preguntas</a>
+        <a href="#contacto">Contacto</a>
+      </div>
+      <div class="nav-cta">
+        <!-- EDITAR: cambia el número por el tuyo (formato internacional, sin + ni espacios) -->
+        <a class="btn btn-accent" href="https://wa.me/34600000000?text=Hola%2C%20me%20gustar%C3%ADa%20informarme%20sobre%20una%20primera%20sesi%C3%B3n" target="_blank" rel="noopener">Escríbeme</a>
+        <button class="menu-btn" id="openMenu" aria-label="Abrir menú">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/></svg>
+        </button>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Menú móvil -->
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="close" id="closeMenu" aria-label="Cerrar menú">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+    </button>
+    <a href="#ayuda">Cómo te ayudo</a>
+    <a href="#sobre">Sobre mí</a>
+    <a href="#proceso">Proceso</a>
+    <a href="#faq">Preguntas</a>
+    <a href="#contacto">Contacto</a>
+    <a class="btn btn-accent" href="https://wa.me/34600000000" target="_blank" rel="noopener" style="font-size:18px">Escríbeme por WhatsApp</a>
+  </div>
+
+  <!-- HERO -->
+  <header class="hero" id="inicio">
+    <div class="eyebrow glass">✦ Terapia psicológica online</div>
+    <h1>Vuelve a<br/>sentirte <span class="soft">tú.</span></h1>
+    <p class="lead">Un espacio seguro para atravesar la ansiedad, reconstruir tu autoestima y volver a respirar. A tu ritmo, en confianza y desde donde estés.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#contacto">Reserva tu primera sesión</a>
+      <a class="btn btn-glass" href="#proceso">Cómo funciona →</a>
+    </div>
+    <div class="hero-trust">
+      <span>◍ Sesiones por videollamada</span>
+      <span>◍ Primera toma de contacto gratuita</span>
+      <span>◍ Confidencial y sin juicios</span>
+    </div>
+  </header>
+
+  <!-- CÓMO TE AYUDO -->
+  <section class="block" id="ayuda">
+    <div class="container">
+      <div class="sec-head reveal">
+        <span class="kicker">En qué te acompaño</span>
+        <h2>Terapia para lo que hoy te pesa</h2>
+        <p>Trabajamos juntos, a tu ritmo, sobre aquello que te está costando llevar. Sin fórmulas mágicas: con herramientas reales y un acompañamiento cercano.</p>
+      </div>
+      <div class="grid">
+        <div class="card glass reveal">
+          <div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22s-8-4.5-8-11a4 4 0 0 1 8-1 4 4 0 0 1 8 1c0 6.5-8 11-8 11z"/></svg></div>
+          <h3>Ansiedad y estrés</h3>
+          <p>Aprende a reconocer lo que la dispara y a recuperar la calma cuando el cuerpo se acelera.</p>
+        </div>
+        <div class="card glass reveal">
+          <div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div>
+          <h3>Autoestima</h3>
+          <p>Deja de exigirte de más y reconstruye una relación más amable y firme contigo.</p>
+        </div>
+        <div class="card glass reveal">
+          <div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 16.5A2.5 2.5 0 0 0 17.5 14H16l-1 6"/><path d="M4 16.5A2.5 2.5 0 0 1 6.5 14H8l1 6"/><path d="M12 14v-3"/><path d="M8 6a4 4 0 0 1 8 0c0 2-2 4-4 5-2-1-4-3-4-5z"/></svg></div>
+          <h3>Duelo y pérdidas</h3>
+          <p>Un lugar para sostener la tristeza, despedirte a tu manera y volver a habitar tu vida.</p>
+        </div>
+        <div class="card glass reveal">
+          <div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <h3>Relaciones y pareja</h3>
+          <p>Entiende tus vínculos, pon límites sanos y comunícate desde lo que de verdad necesitas.</p>
+        </div>
+        <div class="card glass reveal">
+          <div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/></svg></div>
+          <h3>Estado de ánimo</h3>
+          <p>Cuando todo cuesta y nada ilusiona, recuperamos poco a poco la energía y el sentido.</p>
+        </div>
+        <div class="card glass reveal">
+          <div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22c4-4 8-7 8-12a8 8 0 1 0-16 0c0 5 4 8 8 12z"/><path d="M12 10v0"/><path d="M12 22V10M8 12s2-1 4-1 4 1 4 1"/></svg></div>
+          <h3>Crecimiento personal</h3>
+          <p>Momentos de cambio, decisiones difíciles o simplemente ganas de conocerte mejor.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOBRE MÍ -->
+  <section class="block" id="sobre">
+    <div class="container">
+      <div class="about">
+        <div class="portrait glass reveal">
+          <span class="tag">“Ir a terapia es un acto de valentía.”</span>
+        </div>
+        <div class="reveal">
+          <span class="kicker" style="color:var(--accent);font-size:13px;letter-spacing:2px;text-transform:uppercase">Sobre mí</span>
+          <h2>Hola, soy [Tu nombre]</h2>
+          <!-- EDITAR: nombre, número de colegiada y tu enfoque -->
+          <p>Psicóloga sanitaria colegiada (nº [XXXX]) especializada en ansiedad, autoestima y acompañamiento en momentos de cambio. Llevo más de [X] años acompañando a personas a reencontrarse consigo mismas.</p>
+          <p>Mi forma de trabajar es cercana y sin prisas: aquí no hay recetas ni juicios, solo un espacio tuyo para entender lo que te pasa y darte herramientas que de verdad funcionan en tu día a día.</p>
+          <ul>
+            <li><span class="ck">✓</span> Enfoque integrador (cognitivo-conductual y humanista)</li>
+            <li><span class="ck">✓</span> Sesiones online por videollamada, estés donde estés</li>
+            <li><span class="ck">✓</span> Confidencialidad absoluta y trato humano</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESO -->
+  <section class="block" id="proceso">
+    <div class="container">
+      <div class="sec-head reveal">
+        <span class="kicker">Cómo funciona</span>
+        <h2>Empezar es más fácil de lo que crees</h2>
+        <p>Tres pasos sencillos para dar el primer paso sin agobios.</p>
+      </div>
+      <div class="steps">
+        <div class="step glass reveal">
+          <div class="num">01</div>
+          <h3>Escríbeme</h3>
+          <p>Me cuentas brevemente cómo estás por WhatsApp o el formulario. Sin compromiso.</p>
+        </div>
+        <div class="step glass reveal">
+          <div class="num">02</div>
+          <h3>Primera toma de contacto</h3>
+          <p>Una videollamada gratuita de 15 minutos para conocernos y ver si encajamos.</p>
+        </div>
+        <div class="step glass reveal">
+          <div class="num">03</div>
+          <h3>Empezamos el camino</h3>
+          <p>Diseñamos juntos un plan a tu medida y comenzamos a trabajar, sesión a sesión.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIOS -->
+  <section class="block" id="opiniones">
+    <div class="container">
+      <div class="sec-head reveal">
+        <span class="kicker">Personas acompañadas</span>
+        <h2>Lo que cuentan quienes ya dieron el paso</h2>
+        <p>Testimonios reales, compartidos con su permiso y de forma anónima.</p>
+      </div>
+      <div class="quotes">
+        <div class="quote glass reveal">
+          <div class="stars">★★★★★</div>
+          <p>“Llegué sin poder dormir por la ansiedad. Hoy tengo herramientas y vuelvo a sentirme yo.”</p>
+          <div class="who">— M., 34 años</div>
+        </div>
+        <div class="quote glass reveal">
+          <div class="stars">★★★★★</div>
+          <p>“Me sentí escuchada desde el primer minuto. Nunca pensé que hablar aliviara tanto.”</p>
+          <div class="who">— L., 28 años</div>
+        </div>
+        <div class="quote glass reveal">
+          <div class="stars">★★★★★</div>
+          <p>“El formato online me quitó la pereza de ir. Ahora es mi rato de la semana.”</p>
+          <div class="who">— J., 41 años</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="block" id="faq">
+    <div class="container">
+      <div class="sec-head reveal">
+        <span class="kicker">Preguntas frecuentes</span>
+        <h2>Dudas antes de empezar</h2>
+      </div>
+      <div class="faq">
+        <div class="faq-item glass reveal">
+          <button class="faq-q">¿La terapia online funciona igual que la presencial? <span class="pm">＋</span></button>
+          <div class="faq-a"><p>Sí. La evidencia muestra que la terapia por videollamada es igual de eficaz, con la ventaja de la comodidad y de poder hacerla desde tu espacio seguro.</p></div>
+        </div>
+        <div class="faq-item glass reveal">
+          <button class="faq-q">¿Cuánto dura cada sesión y con qué frecuencia? <span class="pm">＋</span></button>
+          <div class="faq-a"><p>Cada sesión dura unos 50-60 minutos. Al principio solemos vernos cada semana y, a medida que avanzas, espaciamos las sesiones.</p></div>
+        </div>
+        <div class="faq-item glass reveal">
+          <button class="faq-q">¿Cuánto cuesta? <span class="pm">＋</span></button>
+          <!-- EDITAR: tus tarifas -->
+          <div class="faq-a"><p>La primera toma de contacto es gratuita. Las sesiones tienen un precio de [XX] €, con bonos disponibles si prefieres varias sesiones. Te lo explico todo sin compromiso.</p></div>
+        </div>
+        <div class="faq-item glass reveal">
+          <button class="faq-q">¿Es todo confidencial? <span class="pm">＋</span></button>
+          <div class="faq-a"><p>Totalmente. Todo lo que compartes está protegido por el secreto profesional. Este es tu espacio seguro.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACTO -->
+  <section class="contact" id="contacto">
+    <div class="container">
+      <div class="contact-card glass-strong reveal">
+        <h2>Da el primer paso hoy</h2>
+        <p>Escríbeme y hablamos. Sin compromiso, a tu ritmo. Estoy aquí para acompañarte.</p>
+        <!-- El formulario abre WhatsApp con tu mensaje ya escrito. También puedes cambiarlo por tu email. -->
+        <form class="form" id="contactForm">
+          <div>
+            <label>Tu nombre</label>
+            <input type="text" name="nombre" placeholder="Cómo te llamas" required />
+          </div>
+          <div>
+            <label>Teléfono o email</label>
+            <input type="text" name="contacto" placeholder="Para responderte" required />
+          </div>
+          <div class="full">
+            <label>¿Qué te trae por aquí? (opcional)</label>
+            <textarea name="mensaje" placeholder="Cuéntame brevemente cómo estás..."></textarea>
+          </div>
+          <div class="actions">
+            <button type="submit" class="btn btn-accent">Enviar por WhatsApp</button>
+            <a class="btn btn-glass" href="mailto:hola@tudominio.com">O escríbeme un email</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container foot">
+      <a href="#inicio" class="brand"><span class="dot"></span>Serena</a>
+      <div>Psicología online · Sesiones por videollamada</div>
+      <div>© <span id="year"></span> Serena. Hecho con calma.</div>
+    </div>
+  </footer>
+
+  <!-- GSAP para reveals suaves + parallax -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script>
+    // Año dinámico
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Menú móvil
+    const menu = document.getElementById('mobileMenu');
+    document.getElementById('openMenu').addEventListener('click', () => menu.classList.add('open'));
+    document.getElementById('closeMenu').addEventListener('click', () => menu.classList.remove('open'));
+    menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => menu.classList.remove('open')));
+
+    // FAQ acordeón
+    document.querySelectorAll('.faq-q').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.closest('.faq-item');
+        const ans = item.querySelector('.faq-a');
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item').forEach(i => { i.classList.remove('open'); i.querySelector('.faq-a').style.maxHeight = null; });
+        if (!isOpen) { item.classList.add('open'); ans.style.maxHeight = ans.scrollHeight + 'px'; }
+      });
+    });
+
+    // Formulario -> WhatsApp con el mensaje ya escrito
+    document.getElementById('contactForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const f = e.target;
+      const texto = `Hola, soy ${f.nombre.value}. Contacto: ${f.contacto.value}. ${f.mensaje.value || ''}`.trim();
+      // EDITAR: pon aquí tu número de WhatsApp (internacional, sin + ni espacios)
+      window.open('https://wa.me/34600000000?text=' + encodeURIComponent(texto), '_blank');
+    });
+
+    // Parallax del fondo con el ratón
+    const bgwrap = document.getElementById('bgwrap');
+    let tx = 0, ty = 0, cx = 0, cy = 0;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduce) {
+      window.addEventListener('mousemove', (e) => {
+        tx = (e.clientX / window.innerWidth - 0.5) * 34;
+        ty = (e.clientY / window.innerHeight - 0.5) * 34;
+      });
+      const tick = () => {
+        cx += (tx - cx) * 0.05; cy += (ty - cy) * 0.05;
+        gsap.set(bgwrap, { x: cx, y: cy });
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+
+    // Reveal on scroll con ScrollTrigger
+    gsap.registerPlugin(ScrollTrigger);
+    document.querySelectorAll('.reveal').forEach((el) => {
+      ScrollTrigger.create({
+        trigger: el,
+        start: 'top 88%',
+        onEnter: () => el.classList.add('is-visible'),
+      });
+    });
+  </script>
+</body>
+</html>

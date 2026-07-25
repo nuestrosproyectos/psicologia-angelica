@@ -36,7 +36,12 @@
   .atmos { position: fixed; inset: 0; z-index: 0; overflow: hidden; }
   .atmos video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.06); }
   /* Cada paisaje se funde con el siguiente al cambiar de capítulo */
-  .atmos .scene-video { transition: opacity 2s cubic-bezier(.4,0,.2,1); will-change: opacity; }
+  .atmos .scene-video {
+    transition: opacity 2s cubic-bezier(.4,0,.2,1); will-change: opacity;
+    /* La foto del paisaje queda debajo del vídeo: si el vídeo no arranca
+       (iOS en Modo de Bajo Consumo), se sigue viendo el paisaje. */
+    background-size: cover; background-position: center; background-repeat: no-repeat;
+  }
   .atmos .tint {
     position: absolute; inset: 0;
     /* Suficiente para leer el texto, pero dejando ver el vídeo. */
@@ -317,10 +322,16 @@
 
   <!-- Atmósfera de fondo: 4 paisajes que se funden según avanza el viaje -->
   <div class="atmos">
-    <video class="scene-video" data-chapter="0" autoplay muted loop playsinline preload="auto" style="opacity:1"><source src="assets/apertura.mp4" type="video/mp4" /></video>
-    <video class="scene-video" data-chapter="1" autoplay muted loop playsinline preload="auto" style="opacity:0"><source src="assets/bosque.mp4" type="video/mp4" /></video>
-    <video class="scene-video" data-chapter="2" autoplay muted loop playsinline preload="auto" style="opacity:0"><source src="assets/mar.mp4" type="video/mp4" /></video>
-    <video class="scene-video" data-chapter="3" autoplay muted loop playsinline preload="auto" style="opacity:0"><source src="assets/amanecer.mp4" type="video/mp4" /></video>
+    <!-- poster = foto fija del paisaje. Si iOS bloquea el vídeo (Modo de Bajo
+         Consumo) o tarda en cargar, se ve la foto y NUNCA un hueco negro. -->
+    <video class="scene-video" data-chapter="0" autoplay muted loop playsinline webkit-playsinline preload="auto"
+           poster="assets/posters/apertura.jpg" style="opacity:1; background-image:url('assets/posters/apertura.jpg')"><source src="assets/apertura.mp4" type="video/mp4" /></video>
+    <video class="scene-video" data-chapter="1" autoplay muted loop playsinline webkit-playsinline preload="metadata"
+           poster="assets/posters/bosque.jpg" style="opacity:0; background-image:url('assets/posters/bosque.jpg')"><source src="assets/bosque.mp4" type="video/mp4" /></video>
+    <video class="scene-video" data-chapter="2" autoplay muted loop playsinline webkit-playsinline preload="metadata"
+           poster="assets/posters/mar.jpg" style="opacity:0; background-image:url('assets/posters/mar.jpg')"><source src="assets/mar.mp4" type="video/mp4" /></video>
+    <video class="scene-video" data-chapter="3" autoplay muted loop playsinline webkit-playsinline preload="metadata"
+           poster="assets/posters/amanecer.jpg" style="opacity:0; background-image:url('assets/posters/amanecer.jpg')"><source src="assets/amanecer.mp4" type="video/mp4" /></video>
     <div class="tint"></div>
   </div>
   <div class="chapter-tint" id="chapterTint"></div>
@@ -547,18 +558,42 @@
   <script>
     gsap.registerPlugin(ScrollTrigger);
 
-    // El vídeo de fondo: Chrome a veces bloquea el autoarranque -> insistimos.
+    // ---- Vídeos de fondo ----
+    // iOS (Safari) NO admite varios vídeos reproduciéndose a la vez: se quedan
+    // congelados. Por eso solo dejamos activo el del capítulo en curso.
+    // Y si el sistema bloquea el autoarranque (Modo de Bajo Consumo), queda
+    // visible el poster del paisaje, nunca un hueco negro.
+    const atmosVideos = [...document.querySelectorAll('.atmos video')];
+    let activeVideo = 0;
+
+    // Reproduce solo los índices indicados y pausa el resto.
+    const playSome = (keep) => {
+      atmosVideos.forEach((v, i) => {
+        if (keep.includes(i)) {
+          v.muted = true;
+          // OJO: nada de v.load() aquí — reinicia el elemento y cancela el play().
+          if (v.preload !== 'auto') v.preload = 'auto';
+          const p = v.play();
+          if (p && p.catch) p.catch(() => {});
+        } else if (!v.paused) {
+          v.pause();
+        }
+      });
+    };
+    const playOnly = (idx) => playSome([idx]);
+
     (() => {
-      const vids = [...document.querySelectorAll('.atmos video')];
-      if (!vids.length) return;
-      const kick = () => vids.forEach(v => { v.muted = true; const p = v.play(); if (p && p.catch) p.catch(() => {}); });
+      if (!atmosVideos.length) return;
+      const kick = () => playOnly(activeVideo);
       kick();
-      vids.forEach(v => v.addEventListener('loadeddata', kick));
+      atmosVideos[0].addEventListener('loadeddata', kick);
       window.addEventListener('load', kick);
-      // Último recurso: al primer gesto del usuario (scroll, clic o tecla)
-      ['pointerdown', 'wheel', 'keydown', 'touchstart'].forEach(ev =>
-        window.addEventListener(ev, kick, { once: true, passive: true })
+      // Si el navegador lo bloqueó, reintentamos al primer gesto del usuario
+      ['pointerdown', 'wheel', 'keydown', 'touchstart', 'touchmove'].forEach(ev =>
+        window.addEventListener(ev, kick, { passive: true })
       );
+      // Al volver a la pestaña, retomar
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) kick(); });
     })();
 
     // Scroll suave y continuo (Lenis) enganchado a ScrollTrigger
@@ -616,8 +651,14 @@
     let currentScene = -1;
     const showScene = (idx) => {
       if (idx === currentScene) return;
+      const prev = currentScene;
       currentScene = idx;
+      activeVideo = idx;
       sceneVideos.forEach((v, i) => { v.style.opacity = (i === idx) ? '1' : '0'; });
+      // Durante el fundido (2s) dejamos los DOS en marcha para que la
+      // transición no se vea cortada; después solo queda el nuevo.
+      playSome(prev >= 0 ? [idx, prev] : [idx]);
+      setTimeout(() => { if (activeVideo === idx) playOnly(idx); }, 2200);
     };
 
     const updateChapter = (prog) => {

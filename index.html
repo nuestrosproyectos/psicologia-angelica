@@ -117,7 +117,11 @@
   #journeyLine .route { fill: none; stroke: var(--accent); stroke-width: 2.6; vector-effect: non-scaling-stroke; stroke-linecap: round; filter: drop-shadow(0 0 8px rgba(169,214,204,0.9)); }
   #journeyLine .marker { fill: #fff; filter: drop-shadow(0 0 8px var(--accent)); }
   #journeyLine .marker-halo { fill: rgba(169,214,204,0.28); }
-  @media (max-width: 899px) { #journeyLine { display: none; } }
+  /* En móvil la línea también se ve, pero recorre la página en VERTICAL. */
+  @media (max-width: 899px) {
+    #journeyLine { height: auto; }
+    #journeyLine .route { stroke-width: 2.2; }
+  }
 
   /* capas de profundidad (parallax) */
   .depth { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
@@ -754,7 +758,7 @@
       };
     });
 
-    // ----- MÓVIL: scroll vertical normal, con revelados -----
+    // ----- MÓVIL: scroll vertical, con revelados y la MISMA línea (en vertical) -----
     mm.add('(max-width: 899px)', () => {
       updateChapter(0);
       gsap.utils.toArray('.rv').forEach((el) => {
@@ -763,11 +767,83 @@
           scrollTrigger: { trigger: el, start: 'top 88%' }
         });
       });
-      // El viaje de color también en móvil, ligado al scroll de la página
-      ScrollTrigger.create({
+
+      // --- Línea-ruta vertical: baja contigo y la bolita la recorre ---
+      const journeyEl = document.getElementById('journey');
+      const svgEl = document.getElementById('journeyLine');
+      const routeEl = document.querySelector('#journeyLine .route');
+      const guideEl = document.querySelector('#journeyLine .route-guide');
+      const markerEl = document.querySelector('#journeyLine .marker');
+      const haloEl = document.querySelector('#journeyLine .marker-halo');
+
+      // Camino que serpentea de arriba abajo (equivalente vertical del de escritorio)
+      const buildVerticalPath = (W, H, segs) => {
+        let seed = 20240726;
+        const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+        const midX = W * 0.5, minX = W * 0.12, maxX = W * 0.88;
+        const clamp = (x) => Math.max(minX, Math.min(maxX, x));
+        const step = H / segs;
+        let y = 0, x = midX;
+        let d = `M${x.toFixed(1)},0`;
+        for (let i = 1; i <= segs; i++) {
+          const ny = step * i;
+          const wave = Math.sin(i * 0.52) * W * 0.30 + Math.sin(i * 1.03 + 1.1) * W * 0.16;
+          const noise = (rnd() - 0.5) * W * 0.20;
+          let nx = clamp(midX + wave + noise);
+          const maxShift = step * 0.7;
+          nx = Math.max(x - maxShift, Math.min(x + maxShift, nx));
+          const cy1 = y + step * 0.42, cy2 = ny - step * 0.42;
+          d += ` C${x.toFixed(1)},${cy1.toFixed(1)} ${nx.toFixed(1)},${cy2.toFixed(1)} ${nx.toFixed(1)},${ny.toFixed(1)}`;
+          x = nx; y = ny;
+        }
+        return d;
+      };
+
+      let routeLen = 0, lastProg = 0;
+      const layoutLine = () => {
+        const W = journeyEl.clientWidth || window.innerWidth;
+        const H = journeyEl.scrollHeight || document.documentElement.scrollHeight;
+        svgEl.setAttribute('viewBox', `0 0 ${W} ${H}`);
+        svgEl.style.height = H + 'px';
+        const d = buildVerticalPath(W, H, Math.max(10, Math.round(H / 420)));
+        routeEl.setAttribute('d', d);
+        guideEl.setAttribute('d', d);
+        routeLen = routeEl.getTotalLength();
+        routeEl.style.strokeDasharray = routeLen;
+        drawLine(lastProg);
+      };
+      const drawLine = (prog) => {
+        lastProg = prog;
+        if (!routeLen) return;
+        routeEl.style.strokeDashoffset = routeLen * (1 - prog);
+        const pt = routeEl.getPointAtLength(routeLen * Math.max(0, Math.min(1, prog)));
+        markerEl.setAttribute('cx', pt.x); markerEl.setAttribute('cy', pt.y);
+        haloEl.setAttribute('cx', pt.x); haloEl.setAttribute('cy', pt.y);
+      };
+      layoutLine();
+
+      // El viaje de color y la línea, ligados al scroll de la página
+      const stM = ScrollTrigger.create({
         trigger: '.journey', start: 'top top', end: 'bottom bottom', scrub: true,
-        onUpdate: (self) => updateChapter(self.progress)
+        onUpdate: (self) => { updateChapter(self.progress); drawLine(self.progress); }
       });
+
+      // Al cargar fotos/fuentes la página cambia de alto: rehacemos el trazado
+      const relayout = () => { layoutLine(); ScrollTrigger.refresh(); };
+      window.addEventListener('load', relayout);
+      window.addEventListener('resize', relayout);
+      document.querySelectorAll('.photo img').forEach((im) => {
+        im.addEventListener('load', relayout);
+        im.addEventListener('error', relayout);
+      });
+      [500, 1400].forEach((ms) => setTimeout(relayout, ms));
+
+      return () => {
+        stM.kill();
+        window.removeEventListener('load', relayout);
+        window.removeEventListener('resize', relayout);
+        svgEl.style.height = '';
+      };
     });
 
     // Navegación: llevar a una escena concreta

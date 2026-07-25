@@ -1,0 +1,23 @@
+FOTOS DE LA WEB — cómo ponerlas
+================================
+
+Copia aquí las fotos del psicólogo/a con EXACTAMENTE estos nombres.
+En cuanto las copies, aparecen solas en la web (solo recarga la página).
+
+  1) retrato.jpg   -> Foto principal del psicólogo/a (escena "Sobre mí")
+                      Ideal: vertical, de cintura para arriba, mirando a cámara,
+                      luz natural y suave. Mínimo 800 x 1000 píxeles.
+
+  2) consulta.jpg  -> La consulta / el espacio de trabajo (o un rincón acogedor).
+                      Ideal: horizontal. Mínimo 1200 x 800 píxeles.
+
+  3) detalle.jpg   -> Un detalle cálido: manos con una taza, una planta,
+                      el sillón, libros... Da humanidad sin enseñar la cara.
+                      Ideal: horizontal. Mínimo 1200 x 800 píxeles.
+
+NOTAS
+-----
+- Valen .jpg o .png (si usas .png, cambia la extensión en el nombre).
+- Si falta alguna foto, en su lugar sale un cartel gris indicándolo.
+  No pasa nada: la web sigue funcionando perfectamente.
+- Para cambiar una foto: copia la nueva encima con el mismo nombre.

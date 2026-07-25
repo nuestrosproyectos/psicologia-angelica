@@ -1,0 +1,6 @@
+# Vídeos originales sin comprimir (32 MB) — solo para recomprimir en local
+assets/orig/
+
+# Herramienta interna de revisión
+_preview-movil.html
+qr-movil.png

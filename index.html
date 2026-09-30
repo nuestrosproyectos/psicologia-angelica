@@ -424,6 +424,20 @@
   /* Pie mínimo en el cierre */
   .piecito { margin-top: 46px; font-size: 12px; font-weight: 300; color: rgba(255,255,255,0.35); letter-spacing: .4px; }
 
+  /* ---------- Modo película (auto-viaje) ---------- */
+  .film-chip {
+    position: fixed; bottom: 88px; left: 50%; transform: translateX(-50%) translateY(20px);
+    z-index: 70; display: flex; align-items: center; gap: 10px;
+    padding: 10px 20px; border-radius: 999px; cursor: pointer;
+    font-size: 13px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted);
+    opacity: 0; pointer-events: none; transition: opacity .5s ease, transform .5s cubic-bezier(0.23,1,0.32,1);
+  }
+  .film-chip.on { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+  .film-chip .pulso { width: 8px; height: 8px; border-radius: 50%; background: var(--warm);
+    box-shadow: 0 0 10px var(--warm); animation: latir 1.6s ease-in-out infinite; }
+  @keyframes latir { 0%,100% { opacity: .5; } 50% { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { #btnPelicula, .film-chip { display: none !important; } }
+
   /* ---------- Barra flotante de conversión (móvil) ---------- */
   .cta-bar {
     position: fixed; left: 14px; right: 14px; bottom: 14px; z-index: 60;
@@ -519,7 +533,7 @@
           <p class="lead rv">Atravesar la ansiedad, reconstruir tu autoestima y volver a respirar. Por videollamada, estés en Bogotá, Medellín o donde estés. A tu ritmo.</p>
           <div class="actions rv">
             <a class="btn btn-primary" href="#" data-goto="6">Reserva tu primera sesión</a>
-            <a class="btn btn-glass" href="#" data-goto="1">Empieza el viaje →</a>
+            <a class="btn btn-glass" href="#" id="btnPelicula">▶&nbsp; Verla como una película</a>
           </div>
 
           <!-- Chapa de identidad: cara + credencial desde el primer segundo -->
@@ -554,8 +568,9 @@
         <div class="inner">
           <p class="big rv">“Pedir ayuda no es rendirse.<br/>Es el primer acto de <span class="soft">valentía</span>.”</p>
           <p class="sub rv">Aquí no estás solo. Este es tu espacio para hablar, respirar y volver a ti.</p>
-          <div class="marquee" aria-hidden="true"><span class="mq">calma ✦ claridad ✦ límites sanos ✦ descanso ✦ presencia ✦ vuelta a ti ✦ calma ✦ claridad ✦ límites sanos ✦ descanso ✦ presencia ✦ vuelta a ti ✦ </span></div>
         </div>
+        <!-- Fuera de .inner: se ancla al borde inferior de la escena, no al texto -->
+        <div class="marquee" aria-hidden="true"><span class="mq">calma ✦ claridad ✦ límites sanos ✦ descanso ✦ presencia ✦ vuelta a ti ✦ calma ✦ claridad ✦ límites sanos ✦ descanso ✦ presencia ✦ vuelta a ti ✦ </span></div>
       </section>
 
       <!-- Escena · Respira conmigo (elemento estrella) -->
@@ -715,6 +730,11 @@
 
     </div>
    </div>
+  </div>
+
+  <!-- Aviso del modo película (también sirve para pararlo) -->
+  <div class="film-chip glass" id="filmChip" role="button" aria-label="Parar el modo película">
+    <span class="pulso"></span> modo película · toca para tomar el control
   </div>
 
   <!-- Barra flotante de conversión (móvil): aparece cuando el CTA del hero deja de verse -->
@@ -1185,6 +1205,69 @@
         });
       }
     }
+
+    // ---- MODO PELÍCULA: la web se recorre sola, como un tráiler ----
+    // Cualquier gesto del usuario (rueda, toque, tecla) devuelve el control.
+    (() => {
+      const btn = document.getElementById('btnPelicula');
+      const chip = document.getElementById('filmChip');
+      if (!btn || !chip || reduce) return;
+
+      let rodando = false, tween = null, espera = null;
+
+      // Posición de scroll que centra cada escena (escritorio: el motor
+      // horizontal mapea 1px de scroll a 1px de desplazamiento del track).
+      const paradas = () => {
+        const esEscritorio = matchMedia('(min-width: 900px)').matches;
+        if (esEscritorio) {
+          const cantidad = track.scrollWidth - window.innerWidth;
+          return panels.map(pn => Math.max(0, Math.min(cantidad,
+            pn.offsetLeft + pn.offsetWidth / 2 - window.innerWidth / 2)));
+        }
+        return panels.map(pn => pn.getBoundingClientRect().top + window.scrollY - 60);
+      };
+
+      const desplazar = (y, dur) => new Promise(res => {
+        const obj = { v: window.scrollY };
+        tween = gsap.to(obj, { v: y, duration: dur, ease: 'power1.inOut',
+          onUpdate: () => window.scrollTo(0, obj.v), onComplete: res });
+      });
+      const pausa = (ms) => new Promise(res => { espera = setTimeout(res, ms); });
+
+      const parar = () => {
+        if (!rodando) return;
+        rodando = false;
+        if (tween) tween.kill();
+        clearTimeout(espera);
+        chip.classList.remove('on');
+        if (window.__lenis) window.__lenis.start();
+        quitarEscuchas();
+      };
+      const alGesto = (e) => { parar(); };
+      const escuchas = ['wheel', 'touchstart', 'keydown'];
+      const ponerEscuchas = () => escuchas.forEach(ev => window.addEventListener(ev, alGesto, { passive: true }));
+      const quitarEscuchas = () => escuchas.forEach(ev => window.removeEventListener(ev, alGesto));
+
+      const rodar = async () => {
+        if (rodando) return;
+        rodando = true;
+        chip.classList.add('on');
+        if (window.__lenis) window.__lenis.stop(); // evita que el lerp de Lenis pelee con el tween
+        setTimeout(ponerEscuchas, 500); // no cancelarse con el propio clic de arranque
+        const stops = paradas();
+        for (let i = 0; i < stops.length && rodando; i++) {
+          const dist = Math.abs(stops[i] - window.scrollY);
+          if (dist > 4) await desplazar(stops[i], Math.max(1.4, Math.min(4.5, dist / 620)));
+          if (!rodando) break;
+          // En la escena de respiración nos quedamos un poco más
+          await pausa(panels[i].dataset.scene === 'breath' ? 5200 : 3800);
+        }
+        parar();
+      };
+
+      btn.addEventListener('click', (e) => { e.preventDefault(); rodar(); });
+      chip.addEventListener('click', parar);
+    })();
 
     // ---- Barra flotante móvil: aparece cuando el CTA del hero deja de verse ----
     (() => {

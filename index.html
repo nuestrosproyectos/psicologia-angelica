@@ -366,6 +366,64 @@
     font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--faint); }
   .breath-hint { color: var(--muted); font-weight: 300; font-size: 15px; margin-top: 22px; }
 
+  /* ---------- Pasada editorial v2.1 ---------- */
+  /* Grano animado (solo escritorio): textura de cine viva */
+  @media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
+    .grain { inset: -4%; animation: granear .9s steps(3) infinite; }
+  }
+  @keyframes granear {
+    0%, 100% { transform: translate(0, 0); }
+    33% { transform: translate(-1.6%, 1.2%); }
+    66% { transform: translate(1.2%, -1.6%); }
+  }
+
+  /* Número de capítulo fantasma (ritmo editorial) */
+  .chapnum {
+    position: absolute; z-index: 1; top: 7vh; right: 6vw; pointer-events: none;
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 300;
+    font-size: clamp(110px, 17vw, 240px); line-height: 1;
+    color: rgba(255,255,255,0.05); user-select: none;
+  }
+  @media (max-width: 899px) { .chapnum { top: 64px; right: 4vw; font-size: 96px; } }
+
+  /* Hero asimétrico en escritorio (nada de todo-centrado) */
+  @media (min-width: 900px) {
+    .panel[data-scene="0"] { align-items: flex-start; text-align: left; padding-left: 9vw; }
+    .panel[data-scene="0"] .inner { max-width: 860px; }
+    .panel[data-scene="0"] .lead { margin-left: 0; }
+    .panel[data-scene="0"] .actions { justify-content: flex-start; }
+  }
+
+  /* Servicios: 2 columnas en escritorio + hover con intención */
+  @media (min-width: 900px) {
+    .services-list { display: grid; grid-template-columns: 1fr 1fr; max-width: 780px; }
+  }
+  .srv { transition: transform .3s cubic-bezier(0.23,1,0.32,1), background .3s ease, box-shadow .3s ease; }
+  .srv:hover { transform: translateY(-3px); background: rgba(255,255,255,0.09); box-shadow: 0 14px 40px rgba(0,0,0,0.35); }
+
+  /* Acento cálido dentro de la cita */
+  .empathy .big .soft { color: var(--warm); }
+
+  /* Marquesina lenta de palabras (empatía) */
+  .marquee { position: absolute; left: 0; right: 0; bottom: 7vh; z-index: 3; overflow: clip;
+    /* ancho definido (no auto): el texto sin saltos no puede ensanchar la página */
+    width: 0; min-width: 100%;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); }
+  .marquee .mq { display: inline-block; white-space: nowrap; will-change: transform;
+    font-family: 'Fraunces', serif; font-style: italic; font-size: clamp(16px, 1.8vw, 22px);
+    color: rgba(255,255,255,0.34); letter-spacing: .5px;
+    animation: desfilar 38s linear infinite; }
+  @keyframes desfilar { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @media (max-width: 899px) { .marquee { position: static; margin-top: 40px; } }
+
+  /* Firma humana en "Sobre mí" */
+  .firma { font-family: 'Fraunces', serif; font-style: italic; font-weight: 300;
+    font-size: 30px; color: var(--warm); margin-top: 18px; transform: rotate(-2deg); }
+
+  /* Pie mínimo en el cierre */
+  .piecito { margin-top: 46px; font-size: 12px; font-weight: 300; color: rgba(255,255,255,0.35); letter-spacing: .4px; }
+
   /* ---------- Barra flotante de conversión (móvil) ---------- */
   .cta-bar {
     position: fixed; left: 14px; right: 14px; bottom: 14px; z-index: 60;
@@ -386,6 +444,8 @@
     .display .w > span { transform: none; }
     .breath-circle { transition: none; }
     .cursor-dot, .cursor-ring { display: none !important; }
+    .grain { animation: none; }
+    .marquee .mq { animation: none; }
   }
 </style>
 </head>
@@ -439,6 +499,7 @@
 
       <!-- Escena 1 · Hero -->
       <section class="panel" data-scene="0">
+        <span class="chapnum" aria-hidden="true">01</span>
         <div class="depth">
           <div class="glow g-violet" data-speed="0.4" style="width:46vw;height:46vw;left:-8vw;top:-6vw"></div>
           <div class="glow g-accent" data-speed="0.7" style="width:38vw;height:38vw;right:-6vw;bottom:-8vw"></div>
@@ -483,6 +544,7 @@
 
       <!-- Escena 2 · Empatía (alma #5) -->
       <section class="panel empathy" data-scene="1">
+        <span class="chapnum" aria-hidden="true">02</span>
         <div class="depth">
           <div class="glow g-warm" data-speed="0.5" style="width:50vw;height:50vw;left:50%;top:50%;transform:translate(-50%,-50%)"></div>
           <div class="rays" data-speed="0.3"></div>
@@ -490,13 +552,15 @@
         <div class="curtain left"></div>
         <div class="curtain right"></div>
         <div class="inner">
-          <p class="big rv">“Pedir ayuda no es rendirse.<br/>Es el primer acto de valentía.”</p>
+          <p class="big rv">“Pedir ayuda no es rendirse.<br/>Es el primer acto de <span class="soft">valentía</span>.”</p>
           <p class="sub rv">Aquí no estás solo. Este es tu espacio para hablar, respirar y volver a ti.</p>
+          <div class="marquee" aria-hidden="true"><span class="mq">calma ✦ claridad ✦ límites sanos ✦ descanso ✦ presencia ✦ vuelta a ti ✦ calma ✦ claridad ✦ límites sanos ✦ descanso ✦ presencia ✦ vuelta a ti ✦ </span></div>
         </div>
       </section>
 
       <!-- Escena · Respira conmigo (elemento estrella) -->
       <section class="panel" data-scene="breath">
+        <span class="chapnum" aria-hidden="true">03</span>
         <div class="depth">
           <div class="glow g-accent" data-speed="0.5" style="width:44vw;height:44vw;left:50%;top:50%;transform:translate(-50%,-50%)"></div>
         </div>
@@ -532,6 +596,7 @@
 
       <!-- Escena · Sobre mí (con retrato real) -->
       <section class="panel" data-scene="about">
+        <span class="chapnum" aria-hidden="true">04</span>
         <div class="depth">
           <div class="glow g-accent" data-speed="0.45" style="width:38vw;height:38vw;left:-8vw;bottom:-10vw"></div>
         </div>
@@ -558,6 +623,7 @@
                 <li><span class="ck">✓</span> Videollamada desde cualquier ciudad de Colombia</li>
                 <li><span class="ck">✓</span> Confidencialidad absoluta y trato humano</li>
               </ul>
+              <p class="firma rv">— Angélica</p>
             </div>
           </div>
         </div>
@@ -568,6 +634,7 @@
 
       <!-- Escena 3 · En qué te acompaño -->
       <section class="panel" data-scene="2">
+        <span class="chapnum" aria-hidden="true">05</span>
         <div class="depth">
           <div class="glow g-accent" data-speed="0.6" style="width:42vw;height:42vw;left:-8vw;bottom:-10vw"></div>
           <div class="glow g-violet" data-speed="0.35" style="width:34vw;height:34vw;right:-6vw;top:-6vw"></div>
@@ -602,6 +669,7 @@
 
       <!-- Escena 4 · Proceso -->
       <section class="panel" data-scene="3">
+        <span class="chapnum" aria-hidden="true">06</span>
         <div class="depth">
           <div class="glow g-warm" data-speed="0.45" style="width:44vw;height:44vw;right:-10vw;top:-8vw"></div>
           <div class="rays" data-speed="0.28"></div>
@@ -624,6 +692,7 @@
 
       <!-- Escena 5 · Contacto -->
       <section class="panel" data-scene="4">
+        <span class="chapnum" aria-hidden="true">07</span>
         <div class="depth">
           <div class="glow g-accent" data-speed="0.5" style="width:48vw;height:48vw;left:50%;top:50%;transform:translate(-50%,-50%)"></div>
           <div class="rays" data-speed="0.3"></div>
@@ -640,6 +709,7 @@
             <a class="btn btn-glass" href="mailto:hola@angelicagiral.co">O un email</a>
           </div>
           <p class="sub rv" style="margin-top:34px;color:var(--faint);font-size:13px;letter-spacing:.5px">Primera toma de contacto gratuita · Confidencial · Videollamada en toda Colombia</p>
+          <p class="piecito rv">© 2026 Angélica Giral · Psicología online · Un viaje de vuelta a ti</p>
         </div>
       </section>
 

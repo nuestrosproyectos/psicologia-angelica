@@ -3,10 +3,10 @@
 """
 Genera con ElevenLabs las locuciones del ejercicio "Respira conmigo":
 
-    assets/audio/inhala.mp3    "Inhala…"
-    assets/audio/sosten.mp3    "Sostén…"
-    assets/audio/exhala.mp3    "Suelta el aire… despacio."
-    assets/audio/muybien.mp3   "Así… muy bien."
+    assets/audio/inhala.wav    "Inhala…"
+    assets/audio/sosten.wav    "Sostén…"
+    assets/audio/exhala.wav    "Suelta el aire… despacio."
+    assets/audio/muybien.wav   "Así… muy bien."
 
 En cuanto existen, la web muestra sola el botón "🔊 con la voz de Angélica"
 (nunca suena de forma automática: el visitante lo activa).
@@ -21,17 +21,17 @@ La voz por defecto es "Sarah" (cálida, sirve en español con el modelo
 multilingüe). Cuando Angélica grabe o elija su voz clonada, pasa su
 voice_id por ELEVEN_VOICE_ID y regenera.
 """
-import json, os, sys, urllib.request
+import json, os, sys, urllib.request, wave
 
 API = "https://api.elevenlabs.io/v1"
 CLAVE = os.environ.get("ELEVENLABS_API_KEY", "").strip()
 VOZ = os.environ.get("ELEVEN_VOICE_ID", "EXAVITQu4vr4xnSDxMaL")  # Sarah
 
 CLIPS = {
-    "inhala.mp3":  "Inhala…",
-    "sosten.mp3":  "Sostén…",
-    "exhala.mp3":  "Suelta el aire… despacio.",
-    "muybien.mp3": "Así… muy bien.",
+    "inhala.wav":  "Inhala…",
+    "sosten.wav":  "Sostén…",
+    "exhala.wav":  "Suelta el aire… despacio.",
+    "muybien.wav": "Así… muy bien.",
 }
 
 def pedir(url, datos=None):
@@ -54,14 +54,15 @@ def main():
     os.makedirs(destino, exist_ok=True)
     for nombre, texto in CLIPS.items():
         print(f"→ {nombre}: “{texto}”")
-        audio = pedir(f"{API}/text-to-speech/{VOZ}?output_format=mp3_44100_96", {
+        audio = pedir(f"{API}/text-to-speech/{VOZ}?output_format=pcm_24000", {
             "text": texto,
             "model_id": "eleven_multilingual_v2",
             # Ajustes para una voz serena, lenta y cercana (no locutora de anuncio)
             "voice_settings": {"stability": 0.6, "similarity_boost": 0.75, "style": 0.25, "speed": 0.85},
         })
-        with open(os.path.join(destino, nombre), "wb") as f:
-            f.write(audio)
+        with wave.open(os.path.join(destino, nombre), "wb") as w:
+            w.setnchannels(1); w.setsampwidth(2); w.setframerate(24000)
+            w.writeframes(audio)
     print(f"\nListo: {len(CLIPS)} clips en {destino}/")
     print("Sube los cambios y el botón de voz aparecerá solo en la web.")
 

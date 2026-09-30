@@ -1227,8 +1227,8 @@
 
       // Voz guiada (opcional, jamás automática): solo si existen los audios.
       const vozBtn = document.getElementById('vozBtn');
-      const RUTAS_VOZ = { 'inhala…': 'assets/audio/inhala.mp3', 'sostén': 'assets/audio/sosten.mp3',
-                          'exhala…': 'assets/audio/exhala.mp3', 'fin': 'assets/audio/muybien.mp3' };
+      const RUTAS_VOZ = { 'inhala…': 'assets/audio/inhala.wav', 'sostén': 'assets/audio/sosten.wav',
+                          'exhala…': 'assets/audio/exhala.wav', 'fin': 'assets/audio/muybien.wav' };
       const clips = {}; let vozOn = false;
       fetch(RUTAS_VOZ['inhala…'], { method: 'HEAD' })
         .then(r => { if (r.ok) vozBtn.hidden = false; }).catch(() => {});

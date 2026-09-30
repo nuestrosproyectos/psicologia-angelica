@@ -365,6 +365,11 @@
   .breath-count { position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
     font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--faint); }
   .breath-hint { color: var(--muted); font-weight: 300; font-size: 15px; margin-top: 22px; }
+  .voz-btn { margin-top: 14px; border-radius: 999px; padding: 9px 18px; font-size: 13px;
+    letter-spacing: .5px; color: var(--muted); background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.16); cursor: pointer; transition: color .2s, border-color .2s; }
+  .voz-btn:hover { color: #fff; border-color: rgba(169,214,204,0.5); }
+  .voz-btn[hidden] { display: none !important; }
 
   /* ---------- Pasada editorial v2.1 ---------- */
   /* Grano animado (solo escritorio): textura de cine viva */
@@ -642,6 +647,8 @@
             <div class="breath-count" id="breathCount"></div>
           </div>
           <p class="breath-hint rv" id="breathHint">Inhala 4 s · sostén 2 s · exhala 6 s</p>
+          <!-- Aparece solo si existen los audios en assets/audio/ (se generan con scripts/generar-voz-respira.py) -->
+          <button class="voz-btn rv" id="vozBtn" hidden type="button">🔊&nbsp; con la voz de Angélica</button>
         </div>
       </section>
 
@@ -1217,11 +1224,33 @@
       ];
       const CICLOS = 4;
       let activo = false, timer = null, ciclo = 0, fase = 0;
+
+      // Voz guiada (opcional, jamás automática): solo si existen los audios.
+      const vozBtn = document.getElementById('vozBtn');
+      const RUTAS_VOZ = { 'inhala…': 'assets/audio/inhala.mp3', 'sostén': 'assets/audio/sosten.mp3',
+                          'exhala…': 'assets/audio/exhala.mp3', 'fin': 'assets/audio/muybien.mp3' };
+      const clips = {}; let vozOn = false;
+      fetch(RUTAS_VOZ['inhala…'], { method: 'HEAD' })
+        .then(r => { if (r.ok) vozBtn.hidden = false; }).catch(() => {});
+      vozBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        vozOn = !vozOn;
+        vozBtn.textContent = vozOn ? '🔇  sin voz' : '🔊  con la voz de Angélica';
+        if (vozOn) for (const k in RUTAS_VOZ) {
+          if (!clips[k]) { clips[k] = new Audio(RUTAS_VOZ[k]); clips[k].preload = 'auto'; }
+        }
+      });
+      const hablar = (clave) => {
+        if (!vozOn || !clips[clave]) return;
+        try { clips[clave].currentTime = 0; clips[clave].play().catch(() => {}); } catch (err) {}
+      };
+
       const decir = (t) => { word.classList.remove('on'); setTimeout(() => { word.textContent = t; word.classList.add('on'); }, 250); };
       const parar = (fin) => {
         activo = false; clearTimeout(timer); ciclo = 0; fase = 0;
         circle.style.transitionDuration = '2.5s'; circle.style.transform = 'scale(1)';
         count.textContent = '';
+        if (fin) hablar('fin');
         decir(fin ? 'así. muy bien.' : 'toca para empezar');
         if (fin) setTimeout(() => { if (!activo) decir('toca para repetir'); }, 3500);
       };
@@ -1229,6 +1258,7 @@
         if (!activo) return;
         const f = FASES[fase];
         decir(f.txt);
+        hablar(f.txt);
         circle.style.transitionDuration = f.ms + 'ms';
         circle.style.transform = 'scale(' + f.scale + ')';
         count.textContent = 'respiración ' + (ciclo + 1) + ' de ' + CICLOS;

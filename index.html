@@ -1215,16 +1215,19 @@
 
       let rodando = false, tween = null, espera = null;
 
-      // Posición de scroll que centra cada escena (escritorio: el motor
+      // Posición de scroll que centra UNA escena (escritorio: el motor
       // horizontal mapea 1px de scroll a 1px de desplazamiento del track).
-      const paradas = () => {
-        const esEscritorio = matchMedia('(min-width: 900px)').matches;
-        if (esEscritorio) {
+      // Se calcula justo antes de viajar a ella: si la página cambia de
+      // medidas por el camino (fuentes, fotos, barra del navegador del
+      // móvil), el destino sigue siendo el bueno y no se salta ninguna.
+      const parada = (i) => {
+        const pn = panels[i];
+        if (matchMedia('(min-width: 900px)').matches) {
           const cantidad = track.scrollWidth - window.innerWidth;
-          return panels.map(pn => Math.max(0, Math.min(cantidad,
-            pn.offsetLeft + pn.offsetWidth / 2 - window.innerWidth / 2)));
+          return Math.max(0, Math.min(cantidad,
+            pn.offsetLeft + pn.offsetWidth / 2 - window.innerWidth / 2));
         }
-        return panels.map(pn => pn.getBoundingClientRect().top + window.scrollY - 60);
+        return Math.max(0, pn.getBoundingClientRect().top + window.scrollY - 60);
       };
 
       const desplazar = (y, dur) => new Promise(res => {
@@ -1254,10 +1257,14 @@
         chip.classList.add('on');
         if (window.__lenis) window.__lenis.stop(); // evita que el lerp de Lenis pelee con el tween
         setTimeout(ponerEscuchas, 500); // no cancelarse con el propio clic de arranque
-        const stops = paradas();
-        for (let i = 0; i < stops.length && rodando; i++) {
-          const dist = Math.abs(stops[i] - window.scrollY);
-          if (dist > 4) await desplazar(stops[i], Math.max(1.4, Math.min(4.5, dist / 620)));
+        for (let i = 0; i < panels.length && rodando; i++) {
+          let destino = parada(i);
+          let dist = Math.abs(destino - window.scrollY);
+          if (dist > 4) await desplazar(destino, Math.max(1.8, Math.min(5, dist / 520)));
+          if (!rodando) break;
+          // Si la página cambió de medidas durante el viaje, corrige el aterrizaje
+          destino = parada(i);
+          if (Math.abs(destino - window.scrollY) > 40) await desplazar(destino, 0.8);
           if (!rodando) break;
           // En la escena de respiración nos quedamos un poco más
           await pausa(panels[i].dataset.scene === 'breath' ? 5200 : 3800);

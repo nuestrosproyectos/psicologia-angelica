@@ -424,6 +424,56 @@
   /* Pie mínimo en el cierre */
   .piecito { margin-top: 46px; font-size: 12px; font-weight: 300; color: rgba(255,255,255,0.35); letter-spacing: .4px; }
 
+  /* ---------- Wow de escenas interiores ---------- */
+  /* Sobre mí: retrato flotando con doble marco editorial */
+  .retrato-wrap { position: relative; }
+  .marco { position: absolute; inset: -14px; border: 1px solid rgba(231,201,160,0.45);
+    border-radius: 26px; transform: rotate(-2.5deg); pointer-events: none; }
+  .marco::after { content: ''; position: absolute; inset: -10px; border: 1px solid rgba(169,214,204,0.22);
+    border-radius: 30px; transform: rotate(1.6deg); }
+  @media (prefers-reduced-motion: no-preference) {
+    .retrato-wrap { animation: flotar 7s ease-in-out infinite; }
+  }
+  @keyframes flotar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  @media (max-width: 899px) {
+    .about-grid .retrato-wrap { width: 100%; max-width: 330px; margin: 0 auto; }
+    .about-grid .retrato-wrap .photo { max-width: none; margin: 0; }
+    /* El marco rotado sobresale unos px: más pequeño y recortado en el borde */
+    .marco { inset: -10px; }
+    .marco::after { inset: -7px; }
+    .panel[data-scene="about"] { overflow-x: clip; }
+  }
+
+  /* Cómo te ayudo: foco que sigue al cursor + número fantasma por tarjeta */
+  .srv { position: relative; overflow: hidden; }
+  .srv::before { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity .4s ease;
+    pointer-events: none;
+    background: radial-gradient(230px circle at var(--mx, 50%) var(--my, 50%), rgba(169,214,204,0.16), transparent 65%); }
+  .srv:hover::before { opacity: 1; }
+  .srv .gnum { position: absolute; right: 12px; top: 0; pointer-events: none;
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 300;
+    font-size: 52px; line-height: 1.1; color: rgba(255,255,255,0.07); }
+
+  /* Proceso: el camino se enciende paso a paso */
+  .steps { position: relative; }
+  .steps-linea { position: absolute; top: -18px; left: 6%; right: 6%; height: 1px;
+    background: linear-gradient(90deg, var(--accent), var(--warm));
+    transform: scaleX(0); transform-origin: left center;
+    transition: transform 1.8s cubic-bezier(0.23,1,0.32,1); }
+  .steps.encendido .steps-linea { transform: scaleX(1); }
+  .step { transition: transform .3s cubic-bezier(0.23,1,0.32,1), background .3s ease; }
+  .step:hover { transform: translateY(-4px); background: rgba(255,255,255,0.09); }
+  .step .num { transition: color .7s ease, text-shadow .7s ease; }
+  .steps.encendido .step .num { color: var(--warm); text-shadow: 0 0 18px rgba(231,201,160,0.6); }
+  .steps.encendido .step:nth-child(1) .num { transition-delay: .2s; }
+  .steps.encendido .step:nth-child(2) .num { transition-delay: .8s; }
+  .steps.encendido .step:nth-child(3) .num { transition-delay: 1.4s; }
+  @media (max-width: 899px) { .steps-linea { display: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .retrato-wrap { animation: none; }
+    .steps-linea { transition: none; }
+  }
+
   /* ---------- Modo película (auto-viaje) ---------- */
   .film-chip {
     position: fixed; bottom: 88px; left: 50%; transform: translateX(-50%) translateY(20px);
@@ -619,12 +669,15 @@
         <div class="curtain right"></div>
         <div class="inner" style="max-width:1040px">
           <div class="about-grid">
-            <div class="photo rv" data-photo="retrato.jpg">
-              <img src="assets/fotos/retrato.jpg" alt="Retrato" />
-              <div class="ph-empty">
-                <div class="ph-ico">👤</div>
-                <div class="ph-name">retrato.jpg</div>
-                <div class="ph-help">Copia aquí tu foto de perfil (vertical, luz natural)</div>
+            <div class="retrato-wrap rv">
+              <div class="marco" aria-hidden="true"></div>
+              <div class="photo" data-photo="retrato.jpg">
+                <img src="assets/fotos/retrato.jpg" alt="Retrato" />
+                <div class="ph-empty">
+                  <div class="ph-ico">👤</div>
+                  <div class="ph-name">retrato.jpg</div>
+                  <div class="ph-help">Copia aquí tu foto de perfil (vertical, luz natural)</div>
+                </div>
               </div>
             </div>
             <div>
@@ -660,10 +713,10 @@
           <div class="kicker rv">En qué te acompaño</div>
           <h2 class="display rv" style="font-size:clamp(34px,5vw,64px)">Terapia para lo que hoy te pesa</h2>
           <div class="services-list">
-            <div class="srv glass rv"><div class="i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22s-8-4.5-8-11a4 4 0 0 1 8-1 4 4 0 0 1 8 1c0 6.5-8 11-8 11z"/></svg></div><div><h3>Ansiedad y estrés</h3><p>Recupera la calma cuando el cuerpo se acelera.</p></div></div>
-            <div class="srv glass rv"><div class="i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div><div><h3>Autoestima</h3><p>Una relación más amable y firme contigo.</p></div></div>
-            <div class="srv glass rv"><div class="i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21C7 17 3 13.5 3 9a4 4 0 0 1 9-1 4 4 0 0 1 9 1c0 4.5-4 8-9 12z"/></svg></div><div><h3>Duelo y pérdidas</h3><p>Sostener la tristeza y volver a habitar tu vida.</p></div></div>
-            <div class="srv glass rv"><div class="i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div><h3>Relaciones y pareja</h3><p>Pon límites sanos y comunícate desde lo que necesitas.</p></div></div>
+            <div class="srv glass rv"><span class="gnum" aria-hidden="true">01</span><div class="i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22s-8-4.5-8-11a4 4 0 0 1 8-1 4 4 0 0 1 8 1c0 6.5-8 11-8 11z"/></svg></div><div><h3>Ansiedad y estrés</h3><p>Recupera la calma cuando el cuerpo se acelera.</p></div></div>
+            <div class="srv glass rv"><span class="gnum" aria-hidden="true">02</span><div class="i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div><div><h3>Autoestima</h3><p>Una relación más amable y firme contigo.</p></div></div>
+            <div class="srv glass rv"><span class="gnum" aria-hidden="true">03</span><div class="i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21C7 17 3 13.5 3 9a4 4 0 0 1 9-1 4 4 0 0 1 9 1c0 4.5-4 8-9 12z"/></svg></div><div><h3>Duelo y pérdidas</h3><p>Sostener la tristeza y volver a habitar tu vida.</p></div></div>
+            <div class="srv glass rv"><span class="gnum" aria-hidden="true">04</span><div class="i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div><h3>Relaciones y pareja</h3><p>Pon límites sanos y comunícate desde lo que necesitas.</p></div></div>
           </div>
         </div>
       </section>
@@ -694,7 +747,8 @@
         <div class="inner">
           <div class="kicker rv">Cómo funciona</div>
           <h2 class="display rv" style="font-size:clamp(34px,5vw,64px)">Empezar es más fácil<br/>de lo que crees</h2>
-          <div class="steps">
+          <div class="steps" id="pasos">
+            <div class="steps-linea" aria-hidden="true"></div>
             <div class="step glass rv"><div class="num">01</div><h3>Escríbeme</h3><p>Me cuentas cómo estás. Sin compromiso.</p></div>
             <div class="step glass rv"><div class="num">02</div><h3>Nos conocemos</h3><p>Una videollamada gratuita de 15 minutos, desde donde estés.</p></div>
             <div class="step glass rv"><div class="num">03</div><h3>Empezamos</h3><p>Un plan a tu medida, sesión a sesión.</p></div>
@@ -1093,37 +1147,51 @@
       };
     });
 
-    // Navegación: llevar a una escena concreta
-    function goToScene(index) {
-      const isDesktop = window.matchMedia('(min-width: 900px)').matches;
-      if (isDesktop) {
-        const st = ScrollTrigger.getById ? null : null;
-        const trigger = ScrollTrigger.getAll().find(t => t.pin);
-        if (trigger) {
-          const target = trigger.start + (trigger.end - trigger.start) * (index / (panels.length - 1));
-          gsap.to(window, { scrollTo: target, duration: 1.1, ease: 'power2.inOut' });
-        }
-      } else {
-        panels[index].scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-    // ScrollToPlugin no está cargado -> usamos scroll nativo como respaldo
+    // Navegación: llevar a una escena concreta.
+    // El motor horizontal no usa "pin": 1px de scroll = 1px de track, así que
+    // el destino es directamente la posición que centra la escena.
     document.querySelectorAll('[data-goto]').forEach((el) => {
       el.addEventListener('click', (e) => {
         e.preventDefault();
         const i = parseInt(el.dataset.goto, 10);
-        const isDesktop = window.matchMedia('(min-width: 900px)').matches;
-        if (isDesktop) {
-          const trigger = ScrollTrigger.getAll().find(t => t.pin);
-          if (trigger) {
-            const target = trigger.start + (trigger.end - trigger.start) * (i / (panels.length - 1));
-            window.scrollTo({ top: target, behavior: 'smooth' });
+        if (!panels[i]) return;
+        if (window.matchMedia('(min-width: 900px)').matches) {
+          const cantidad = track.scrollWidth - window.innerWidth;
+          const destino = Math.max(0, Math.min(cantidad,
+            panels[i].offsetLeft + panels[i].offsetWidth / 2 - window.innerWidth / 2));
+          if (window.__lenis) {
+            window.__lenis.scrollTo(destino, { duration: 1.5 });
+          } else {
+            const obj = { v: window.scrollY };
+            gsap.to(obj, { v: destino, duration: 1.4, ease: 'power2.inOut',
+              onUpdate: () => window.scrollTo(0, obj.v) });
           }
         } else {
           panels[i].scrollIntoView({ behavior: 'smooth' });
         }
       });
     });
+
+    // "Cómo te ayudo": el foco de luz sigue al cursor dentro de cada tarjeta
+    if (matchMedia('(pointer: fine)').matches) {
+      document.querySelectorAll('.srv').forEach((c) => {
+        c.addEventListener('mousemove', (e) => {
+          const r = c.getBoundingClientRect();
+          c.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+          c.style.setProperty('--my', (e.clientY - r.top) + 'px');
+        });
+      });
+    }
+
+    // "Proceso": el camino se enciende paso a paso al entrar en escena
+    (() => {
+      const pasos = document.getElementById('pasos');
+      if (!pasos) return;
+      const io = new IntersectionObserver((es) => {
+        if (es[0].isIntersecting) { pasos.classList.add('encendido'); io.disconnect(); }
+      }, { threshold: 0.35 });
+      io.observe(pasos);
+    })();
 
     // ---- Titular del hero: revelado palabra a palabra (split-text) ----
     (() => {

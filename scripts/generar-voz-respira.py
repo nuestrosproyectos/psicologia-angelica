@@ -35,15 +35,16 @@ CLIPS = {
 }
 
 def pedir(url, datos=None):
-    req = urllib.request.Request(url, headers={"xi-api-key": CLAVE, "Content-Type": "application/json"},
+    # Si no hay clave en el entorno, la inyecta la pasarela de Claude (credencial
+    # del entorno): en ese caso NO mandamos la cabecera para no pisarla en vacío.
+    cab = {"Content-Type": "application/json"}
+    if CLAVE: cab["xi-api-key"] = CLAVE
+    req = urllib.request.Request(url, headers=cab,
                                  data=json.dumps(datos).encode() if datos else None)
     with urllib.request.urlopen(req, timeout=60) as r:
         return r.read()
 
 def main():
-    if not CLAVE:
-        sys.exit("Falta ELEVENLABS_API_KEY (ponla como secreto del entorno; nunca en el chat).")
-
     if "--listar" in sys.argv:
         voces = json.loads(pedir(API + "/voices"))["voices"]
         for v in voces:

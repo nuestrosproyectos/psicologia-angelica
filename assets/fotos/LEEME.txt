@@ -21,3 +21,8 @@ NOTAS
 - Si falta alguna foto, en su lugar sale un cartel gris indicándolo.
   No pasa nada: la web sigue funcionando perfectamente.
 - Para cambiar una foto: copia la nueva encima con el mismo nombre.
+
+NOTA (oct 2026): las tres fotos actuales están generadas con IA (Nano Banana 2)
+en estilo editorial, sin mostrar ninguna cara reconocible (el retrato es de
+espaldas a propósito: no queremos inventarle una cara a Angélica). Cuando haya
+fotos reales suyas, cópialas encima con estos mismos nombres y listo.
